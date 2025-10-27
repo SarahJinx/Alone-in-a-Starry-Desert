@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class ThirdPersonCamera : MonoBehaviour
@@ -15,13 +13,17 @@ public class ThirdPersonCamera : MonoBehaviour
 
     void Start()
     {
-        // Lock and hide the cursor for better control
+        // Lock and hide the cursor for gameplay
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
     }
 
     void LateUpdate()
     {
+        // Do not move camera if the game is paused
+        if (PauseMenu.GameIsPaused)
+            return;
+
         if (!target) return;
 
         // --- MOUSE INPUT ---

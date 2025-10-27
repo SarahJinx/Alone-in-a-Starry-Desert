@@ -22,6 +22,8 @@ public class PauseMenu : MonoBehaviour
         pauseMenuUI.SetActive(false);
         Time.timeScale = 1f;
         GameIsPaused = false;
+
+        // Lock the cursor again for gameplay
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
     }
@@ -31,13 +33,16 @@ public class PauseMenu : MonoBehaviour
         pauseMenuUI.SetActive(true);
         Time.timeScale = 0f;
         GameIsPaused = true;
+
+        // Show the cursor when paused
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
     }
 
+
     public void LoadMainMenu()
     {
-        Time.timeScale = 1f;
+        Time.timeScale = 1f; // Reset game speed before switching
         SceneManager.LoadScene("MainMenu");
     }
 
