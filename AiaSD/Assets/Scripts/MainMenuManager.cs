@@ -1,26 +1,30 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public class MainMenu : MonoBehaviour
+public class MainMenuManager : MonoBehaviour
 {
-    [Header("Menus")]
-    public GameObject optionsPanel;  // The options panel to open/close
+    [Header("Panels")]
+    public GameObject optionsPanel;
+
+    void Start()
+    {
+        // Make cursor visible in the main menu
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
+    }
 
     public void PlayGame()
     {
-        // Load the gameplay scene
         SceneManager.LoadScene("GameScene");
     }
 
     public void OpenOptions()
     {
-        // Activate the options panel
         optionsPanel.SetActive(true);
     }
 
     public void CloseOptions()
     {
-        // Close the options panel
         optionsPanel.SetActive(false);
     }
 
@@ -28,10 +32,8 @@ public class MainMenu : MonoBehaviour
     {
         Debug.Log("Quit Game!");
 #if UNITY_EDITOR
-        // Stop play mode if running in the Unity Editor
         UnityEditor.EditorApplication.isPlaying = false;
 #else
-        // Close the application if built
         Application.Quit();
 #endif
     }
