@@ -17,6 +17,14 @@ public class PlayerController : MonoBehaviour
     private CharacterController controller;
     private Vector3 velocity;             // Vertical movement (gravity/jump)
     private bool isGrounded;              // Whether the player is touching the ground
+    private bool jumpPressed;             // Prevents multiple jumps per button hold
+    private bool isJumping;               // True while jump is active
+    private float jumpTime;               // Time spent holding the jump
+
+    // Jump settings
+    private float maxJumpHoldTime = 0.30f;  // Max time to hold jump
+    private float jumpBufferTime = 0.1f;    // Buffer window before landing
+    private float jumpBufferCounter;       // Timer for buffered jump input
 
     void Start()
     {
@@ -27,7 +35,34 @@ public class PlayerController : MonoBehaviour
     void Update()
     {
         // --- GROUND CHECK ---
+        bool wasGrounded = isGrounded;
         isGrounded = Physics.CheckSphere(groundCheck.position, groundDistance, groundMask);
+
+        // --- JUMP BUFFER TIMER ---
+        if (Input.GetButtonDown("Jump"))
+        {
+            // Start the buffer timer when jump is pressed
+            jumpBufferCounter = jumpBufferTime;
+        }
+        else
+        {
+            // Decrease buffer timer over time
+            jumpBufferCounter -= Time.deltaTime;
+        }
+
+        // --- RESET ON LANDING ---
+        if (isGrounded && !wasGrounded)
+        {
+            // Just landed
+            isJumping = false;
+            jumpTime = 0f;
+
+            // If player pressed jump shortly before landing, jump immediately
+            if (jumpBufferCounter > 0f)
+            {
+                PerformJump();
+            }
+        }
 
         // If on the ground and falling, reset vertical velocity
         if (isGrounded && velocity.y < 0)
@@ -43,15 +78,46 @@ public class PlayerController : MonoBehaviour
         // Apply horizontal movement (XZ)
         controller.Move(move * speed * Time.deltaTime);
 
-        // --- JUMP ---
-        if (Input.GetButtonDown("Jump") && isGrounded)
-            velocity.y = Mathf.Sqrt(jumpForce * -2f * gravity);
+        // --- NORMAL JUMP INPUT ---
+        if (Input.GetButtonDown("Jump") && isGrounded && !jumpPressed)
+        {
+            PerformJump();
+        }
 
-        // --- GRAVITY ---
-        velocity.y += gravity * Time.deltaTime;
+        // Reset jumpPressed once the button is released
+        if (Input.GetButtonUp("Jump"))
+            jumpPressed = false;
+
+        // --- VARIABLE JUMP HEIGHT ---
+        if (isJumping && Input.GetButton("Jump"))
+        {
+            jumpTime += Time.deltaTime;
+
+            // While holding jump and within limit, reduce gravity effect
+            if (jumpTime < maxJumpHoldTime)
+            {
+                velocity.y += (-gravity * 0.5f) * Time.deltaTime; // less gravity while holding
+            }
+        }
+
+        // --- APPLY GRAVITY ---
+        if (!isJumping || !Input.GetButton("Jump") || jumpTime >= maxJumpHoldTime)
+        {
+            velocity.y += gravity * Time.deltaTime;
+        }
 
         // Apply vertical movement (falling/jumping)
         controller.Move(velocity * Time.deltaTime);
+    }
+
+    // --- HANDLE JUMP EXECUTION ---
+    private void PerformJump()
+    {
+        velocity.y = Mathf.Sqrt(jumpForce * -2f * gravity);
+        isJumping = true;
+        jumpPressed = true;
+        jumpTime = 0f;
+        jumpBufferCounter = 0f; // reset buffer after performing jump
     }
 
     private void OnDrawGizmosSelected()
