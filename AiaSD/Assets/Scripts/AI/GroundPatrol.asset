@@ -1,0 +1,19 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a5dcd140004245c4a927214722fa5441, type: 3}
+  m_Name: GroundPatrol
+  m_EditorClassIdentifier: 
+  action:
+  - {fileID: 11400000, guid: 31fb027ed26066c4d8175d2a7c2fc28c, type: 2}
+  nextState:
+  - {fileID: 11400000, guid: 31a28b0b572b5a04293f64deb2adcf06, type: 2}
+  stopDistance: 1
