@@ -110,13 +110,13 @@ public class PlayerController : MonoBehaviour
         Debug.Log($"Move vector: {move}, magnitude: {move.magnitude}");
         controller.Move(move * speed * Time.deltaTime);
 
-        // Rotate player smoothly toward move direction if there's input
-        if (inputVector.magnitude >= 0.1f)
-        {
-            float targetAngle = Mathf.Atan2(move.x, move.z) * Mathf.Rad2Deg;
-            float angle = Mathf.SmoothDampAngle(transform.eulerAngles.y, targetAngle, ref rotationVelocity, rotationSmoothTime);
-            transform.rotation = Quaternion.Euler(0f, angle, 0f);
-        }
+        //// Rotate player smoothly toward move direction if there's input
+        //if (inputVector.magnitude >= 0.1f)
+        //{
+        //    float targetAngle = Mathf.Atan2(move.x, move.z) * Mathf.Rad2Deg;
+        //    float angle = Mathf.SmoothDampAngle(transform.eulerAngles.y, targetAngle, ref rotationVelocity, rotationSmoothTime);
+        //    transform.rotation = Quaternion.Euler(0f, angle, 0f);
+        //}
 
         // --- NORMAL JUMP INPUT ---
         if (Input.GetButtonDown("Jump") && isGrounded && !jumpPressed)
