@@ -5,9 +5,17 @@ using UnityEngine;
 public class PlayerController : MonoBehaviour
 {
     [Header("Movement")]
-    public float speed = 5f;              // Movement speed
-    public float jumpForce = 8f;          // Jump strength
-    public float gravity = -9.81f;        // Gravity value
+    public float speed = 7f;              // Movement speed
+    public float jumpForce = 6f;          // Jump strength
+    public float gravity = -20f;        // Gravity value
+
+    [Header("Sprint")]
+    public float sprintMultiplier = 2f;
+    public KeyCode sprintKey = KeyCode.LeftShift;
+    public float sprintSmoothTime = 0.2f; // Time to reach full sprint speed
+    private bool isSprinting = false;
+    private float currentSpeed;
+    private float speedVelocity; // Smooth damping velocity reference
 
     [Header("Ground Check")]
     public Transform groundCheck;         // Point below the player
@@ -73,6 +81,15 @@ public class PlayerController : MonoBehaviour
         float horizontal = Input.GetAxisRaw("Horizontal");
         float vertical = Input.GetAxisRaw("Vertical");
 
+        // --- SPRINT INPUT ---
+        isSprinting = Input.GetKey(sprintKey);
+
+        // Calculate target speed
+        float targetSpeed = isSprinting ? speed * sprintMultiplier : speed;
+
+        // Smoothly interpolate current speed towards target speed
+        currentSpeed = Mathf.SmoothDamp(currentSpeed, targetSpeed, ref speedVelocity, sprintSmoothTime);
+
         // Vector de entrada normalizado
         Vector3 inputVector = new Vector3(horizontal, 0f, vertical).normalized;
 
@@ -108,15 +125,15 @@ public class PlayerController : MonoBehaviour
 
         // Apply horizontal movement
         Debug.Log($"Move vector: {move}, magnitude: {move.magnitude}");
-        controller.Move(move * speed * Time.deltaTime);
+        controller.Move(move * currentSpeed * Time.deltaTime);
 
-        //// Rotate player smoothly toward move direction if there's input
-        //if (inputVector.magnitude >= 0.1f)
-        //{
-        //    float targetAngle = Mathf.Atan2(move.x, move.z) * Mathf.Rad2Deg;
-        //    float angle = Mathf.SmoothDampAngle(transform.eulerAngles.y, targetAngle, ref rotationVelocity, rotationSmoothTime);
-        //    transform.rotation = Quaternion.Euler(0f, angle, 0f);
-        //}
+        // Rotate player smoothly toward move direction if there's input
+        if (inputVector.magnitude >= 0.1f)
+        {
+            float targetAngle = Mathf.Atan2(move.x, move.z) * Mathf.Rad2Deg;
+            float angle = Mathf.SmoothDampAngle(transform.eulerAngles.y, targetAngle, ref rotationVelocity, rotationSmoothTime);
+            transform.rotation = Quaternion.Euler(0f, angle, 0f);
+        }
 
         // --- NORMAL JUMP INPUT ---
         if (Input.GetButtonDown("Jump") && isGrounded && !jumpPressed)
